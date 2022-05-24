@@ -22,8 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'userId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     Post.hasMany(models.Comment, {
@@ -31,8 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'postId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     Post.hasMany(models.Like, {
@@ -40,8 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'postId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
   };
   return Post;

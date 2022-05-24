@@ -1,16 +1,43 @@
 const validator = require('validator');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 const { User } = require('../models/index');
 const createError = require('../utils/createError');
 
+const genToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
 exports.login = async (req, res, next) => {
   try {
+    const { emailOrPhone, password } = req.body;
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [{ email: emailOrPhone }, { phoneNumber: emailOrPhone }],
+      },
+    });
+
+    if (!user) {
+      createError('invalid credential', 400);
+    }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+
+    if (!isMatch) {
+      createError('invalid credential', 400);
+    }
+
+    const token = genToken({ id: user.id });
+    res.json({ token });
   } catch (err) {
     next(err);
   }
 };
+
 exports.signup = async (req, res, next) => {
   try {
     const { firstName, lastName, emailOrPhone, password, confirmPassword } =

@@ -44,8 +44,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'userId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     User.hasMany(models.Comment, {
@@ -53,8 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'userId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     User.hasMany(models.Like, {
@@ -62,18 +60,16 @@ module.exports = (sequelize, DataTypes) => {
         name: 'userId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     User.hasMany(models.Friend, {
       as: 'RequestFrom',
       foreignKey: {
-        name: 'requestToFromId',
+        name: 'requestFromId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
 
     User.hasMany(models.Friend, {
@@ -82,8 +78,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'requestToId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
+
     });
   };
 

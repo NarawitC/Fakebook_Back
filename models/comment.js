@@ -18,8 +18,6 @@ module.exports = (sequelize, DataTypes) => {
         name: 'userId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
     });
 
     Comment.belongsTo(models.Post, {
@@ -27,8 +25,6 @@ module.exports = (sequelize, DataTypes) => {
         name: 'postId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
     });
   };
   return Comment;

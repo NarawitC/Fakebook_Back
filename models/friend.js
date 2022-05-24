@@ -1,11 +1,13 @@
+const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
+
 module.exports = (sequelize, DataTypes) => {
   const Friend = sequelize.define(
     'Friend',
     {
       status: {
-        type: DataTypes.ENUM('ACCEPTED', 'PENDING'),
+        type: DataTypes.ENUM(FRIEND_ACCEPTED, FRIEND_PENDING),
         allowNull: false,
-        defaultValue: 'PENDING',
+        defaultValue: FRIEND_PENDING,
       },
     },
     { underscored: true }
@@ -14,21 +16,17 @@ module.exports = (sequelize, DataTypes) => {
     Friend.belongsTo(models.User, {
       as: 'RequestFrom',
       foreignKey: {
-        name: 'requestToFromId',
+        name: 'requestFromId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
     });
 
-    Friend.belongsTo(models.Post, {
+    Friend.belongsTo(models.User, {
       as: 'RequestTo',
       foreignKey: {
         name: 'requestToId',
         allowNull: false,
       },
-      onUpdate: 'RESTRICT',
-      onDelete: 'RESTRICT',
     });
   };
   return Friend;
