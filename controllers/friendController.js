@@ -6,7 +6,22 @@ const friendService = require('../services/friendService');
 
 exports.getAllFriend = async (req, res, next) => {
   try {
-    const users = await friendService.findAcceptedFriend(req.user.id);
+    const { status } = req.query;
+    let users = [];
+    switch (status?.toUpperCase()) {
+      case 'UNKNOWN':
+        users = await friendService.findUnknown(req.user.id);
+        break;
+      case 'PENDING':
+        users = await friendService.findPendingFriend(req.user.id);
+        break;
+      case 'REQUESTED':
+        users = await friendService.findRequestFriend(req.user.id);
+        break;
+      default:
+        users = await friendService.findAcceptedFriend(req.user.id);
+        break;
+    }
     res.json({ users });
   } catch (err) {
     next(err);
