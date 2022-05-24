@@ -3,6 +3,17 @@ const fs = require('fs');
 const friendService = require('../services/friendService');
 const { User } = require('../models/index');
 
+const upload = (path) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(path, (error, result) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(result);
+    });
+  });
+};
+
 exports.getMe = async (req, res, next) => {
   try {
     const friends = await friendService.findAcceptedFriend(req.user.id);
@@ -17,17 +28,24 @@ exports.getMe = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     // console.log(req.file);
-    cloudinary.uploader.upload(req.file.path, async (error, result) => {
-      if (error) {
-        return next(error);
-      }
-      await User.update(
-        { profilePic: result.secure_url },
-        { where: { id: req.user.id } }
-      );
-      res.json({ profilePic: result.secure_url });
-      fs.unlinkSync(req.file.path);
-    });
+    // cloudinary.uploader.upload(req.file.path, async (error, result) => {
+    //   if (error) {
+    //     return next(error);
+    //   }
+    //   await User.update(
+    //     { profilePic: result.secure_url },
+    //     { where: { id: req.user.id } }
+    //   );
+    //   res.json({ profilePic: result.secure_url });
+    //   fs.unlinkSync(req.file.path);
+    // });
+    const result = await upload(req.file.path);
+    await User.update(
+      { profilePic: result.secure_url },
+      { where: { id: req.user.id } }
+    );
+    res.json({ profilePic: result.secure_url });
+    fs.unlinkSync(req.file.path);
   } catch (err) {
     next(err);
   }
