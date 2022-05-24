@@ -1,7 +1,17 @@
 const createError = require('../utils/createError');
-const { Friend } = require('../models/index');
+const { Friend, User } = require('../models/index');
 const { Op } = require('sequelize');
 const { FRIEND_ACCEPTED, FRIEND_PENDING } = require('../config/constants');
+const friendService = require('../services/friendService');
+
+exports.getAllFriend = async (req, res, next) => {
+  try {
+    const users = await friendService.findAcceptedFriend(req.user.id);
+    res.json({ users });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.requestFriend = async (req, res, next) => {
   try {
