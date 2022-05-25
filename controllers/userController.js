@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const friendService = require('../services/friendService');
-const { User, Comment, Post } = require('../models/index');
+const { User, Comment, Post, Like } = require('../models/index');
 const cloudinary = require('../utils/cloundinary');
 const createError = require('../utils/createError');
 
@@ -73,10 +73,28 @@ exports.getUserPost = async (req, res, next) => {
     const userId = await friendService.findFriendId(req.user.id);
     userId.push(req.user.id);
     const posts = await Post.findAll({
+      attributes: { exclude: ['userId'] },
       where: { userId },
       include: [
-        { model: User, attributes: { exclude: ['password'] } },
-        { model: Comment },
+        {
+          model: User,
+          attributes: {
+            exclude: [
+              'password',
+              'email',
+              'phoneNumber',
+              'coverPhoto',
+              'createdAt',
+            ],
+          },
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ['userId', 'createdAt'],
+          },
+        },
+        { model: Like },
       ],
     });
     res.json({ posts });
