@@ -6,6 +6,8 @@ const commentController = require('../controllers/commentController');
 const upload = require('../middlewares/upload');
 
 router.post('/', upload.single('image'), postController.createPost);
+router.delete('/:id', postController.deletePost);
+
 router.post('/:postId/like', postController.likePost);
 router.delete('/:postId/like', postController.unLikePost);
 

@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const { Post, Like, sequelize } = require('../models/index');
+const { Post, Like, sequelize, Comment } = require('../models/index');
 const cloudinary = require('../utils/cloundinary');
 const createError = require('../utils/createError');
 
@@ -25,6 +25,34 @@ exports.createPost = async (req, res, next) => {
     if (file) {
       fs.unlinkSync(file.path);
     }
+  }
+};
+
+exports.deletePost = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { id } = req.params;
+    const post = await Post.findOne({ where: { id } });
+    if (!post) {
+      createError('Post not found', 400);
+    }
+    if (post.userId !== req.user.id) {
+      createError('You have no permission', 403);
+    }
+    await Comment.destroy({ where: { postId: id } }, { transaction });
+    await Like.destroy({ where: { postId: id } }, { transaction });
+
+    if (post.image) {
+      const splitted = req.user.profilePic.split('/');
+      const publicId = splitted[splitted.length - 1].split('.')[0];
+      await cloudinary.destroy(publicId);
+    }
+    await Post.destroy({ where: { id } }, { transaction });
+    await transaction.commit();
+    res.status(204).json();
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
   }
 };
 
