@@ -1,20 +1,9 @@
 const fs = require('fs');
 
 const friendService = require('../services/friendService');
-const { User } = require('../models/index');
+const { User, Comment, Post } = require('../models/index');
 const cloudinary = require('../utils/cloundinary');
 const createError = require('../utils/createError');
-
-const upload = (path) => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(path, (error, result) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(result);
-    });
-  });
-};
 
 exports.getMe = async (req, res, next) => {
   try {
@@ -76,5 +65,22 @@ exports.updateProfile = async (req, res, next) => {
     if (req.files.coverPhoto) {
       fs.unlinkSync(req.files.coverPhoto[0].path);
     }
+  }
+};
+
+exports.getUserPost = async (req, res, next) => {
+  try {
+    const userId = await friendService.findFriendId(req.user.id);
+    userId.push(req.user.id);
+    const posts = await Post.findAll({
+      where: { userId },
+      include: [
+        { model: User, attributes: { exclude: ['password'] } },
+        { model: Comment },
+      ],
+    });
+    res.json({ posts });
+  } catch (err) {
+    next(err);
   }
 };

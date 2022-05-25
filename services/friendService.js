@@ -71,3 +71,16 @@ exports.findUnknown = async (id) => {
   });
   return users;
 };
+
+exports.findFriendId = async (id) => {
+  const friends = await Friend.findAll({
+    where: {
+      status: FRIEND_ACCEPTED,
+      [Op.or]: [{ requestToId: id }, { requestFromId: id }],
+    },
+  });
+  const friendsId = friends.map((el) => {
+    return el.requestToId === id ? el.requestFromId : el.requestToId;
+  });
+  return friendsId;
+};

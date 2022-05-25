@@ -12,5 +12,6 @@ router.patch(
   ]),
   userController.updateProfile
 );
+router.get('/posts', userController.getUserPost);
 
 module.exports = router;
