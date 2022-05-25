@@ -48,7 +48,7 @@ exports.likePost = async (req, res, next) => {
     );
 
     await post.increment('like', { by: 1, transaction });
-    await transaction.commit();
+    await transaction.commit(); //* end transaction
     res.json({ like });
   } catch (err) {
     await transaction.rollback();
@@ -72,7 +72,7 @@ exports.unLikePost = async (req, res, next) => {
     }
     await liked.destroy({ transaction });
     await post.decrement('like', { by: 1, transaction });
-    await transaction.commit();
+    await transaction.commit(); //* end transaction
     res.status(204).json();
   } catch (err) {
     await transaction.rollback();
