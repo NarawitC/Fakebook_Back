@@ -42,19 +42,39 @@ exports.updateProfile = async (req, res, next) => {
     //   res.json({ profilePic: result.secure_url });
     //   fs.unlinkSync(req.file.path);
     // });
-
     //  ------------------------------- promise -------------------------------
-    if (!req.file) {
-      createError('Profile is required', 400);
+    if (!req.files) {
+      createError('Profile pic or cover photo is required', 400);
     }
-    const result = await cloudinary.upload(req.file.path);
-    await User.update(
-      { profilePic: result.secure_url },
-      { where: { id: req.user.id } }
-    );
-    fs.unlinkSync(req.file.path);
-    res.json({ profilePic: result.secure_url });
+    const updateValue = {};
+    if (req.files.profilePic) {
+      const result = await cloudinary.upload(req.files.profilePic[0].path);
+      if (req.user.profilePic) {
+        const splitted = req.user.profilePic.split('/');
+        const publicId = splitted[splitted.length - 1].split('.')[0];
+        await cloudinary.destroy(publicId);
+      }
+      updateValue.profilePic = result.secure_url;
+    }
+    if (req.files.coverPhoto) {
+      const result = await cloudinary.upload(req.files.coverPhoto[0].path);
+      if (req.user.coverPhoto) {
+        const splitted = req.user.coverPhoto.split('/');
+        const publicId = splitted[splitted.length - 1].split('.')[0];
+        await cloudinary.destroy(publicId);
+      }
+      updateValue.coverPhoto = result.secure_url;
+    }
+    await User.update(updateValue, { where: { id: req.user.id } });
+    res.json(updateValue);
   } catch (err) {
     next(err);
+  } finally {
+    if (req.files.profilePic) {
+      fs.unlinkSync(req.files.profilePic[0].path);
+    }
+    if (req.files.coverPhoto) {
+      fs.unlinkSync(req.files.coverPhoto[0].path);
+    }
   }
 };

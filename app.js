@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === 'development') {
 const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
 const friendRouter = require('./routes/friendRoutes');
+const postRouter = require('./routes/postRoutes');
 // ----------------------------- Sync to create database -----------------------------
 // const { sequelize } = require('./models/index');
 // sequelize.sync({ alter: true });
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/auth', authRouter);
 app.use('/user', authenticateMiddleware, userRouter);
 app.use('/friends', authenticateMiddleware, friendRouter);
+app.use('/posts', authenticateMiddleware, postRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
