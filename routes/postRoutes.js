@@ -7,6 +7,7 @@ const upload = require('../middlewares/upload');
 
 router.post('/', upload.single('image'), postController.createPost);
 router.delete('/:id', postController.deletePost);
+router.patch('/:id', upload.single('image'), postController.updatePost);
 
 router.post('/:postId/like', postController.likePost);
 router.delete('/:postId/like', postController.unLikePost);

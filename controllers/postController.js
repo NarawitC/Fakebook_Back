@@ -56,6 +56,47 @@ exports.deletePost = async (req, res, next) => {
   }
 };
 
+exports.updatePost = async (req, res, next) => {
+  const file = req.file;
+  try {
+    const { title } = req.body;
+    const { id } = req.params;
+    if (!title && !file) {
+      createError('Title or image is required', 400);
+    }
+    const post = await Post.findOne({ where: { id } });
+    if (!post) {
+      createError('Post not found', 400);
+    }
+    if (post.userId !== req.user.id) {
+      createError('You have no permission', 403);
+    }
+
+    if (file) {
+      if (post.image) {
+        const splitted = req.user.profilePic.split('/');
+        const publicId = splitted[splitted.length - 1].split('.')[0];
+        await cloudinary.destroy(publicId);
+      }
+      const result = await cloudinary.upload(file.path);
+      post.image = result.secure_url;
+    }
+
+    if (title) {
+      post.title = title;
+    }
+    await post.save();
+
+    res.json({ post });
+  } catch (err) {
+    next(err);
+  } finally {
+    if (file) {
+      fs.unlinkSync(file.path);
+    }
+  }
+};
+
 exports.likePost = async (req, res, next) => {
   const transaction = await sequelize.transaction(); //* start transaction
   try {
