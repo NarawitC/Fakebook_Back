@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/auth', authRouter);
-app.use('/user', authenticateMiddleware, userRouter);
+app.use('/users', authenticateMiddleware, userRouter);
 app.use('/friends', authenticateMiddleware, friendRouter);
 app.use('/posts', authenticateMiddleware, postRouter);
 
