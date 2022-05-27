@@ -13,5 +13,6 @@ router.patch(
   userController.updateProfile
 );
 router.get('/posts', userController.getUserPost);
+router.get('/:userId', userController.getUserById);
 
 module.exports = router;

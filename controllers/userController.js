@@ -1,7 +1,8 @@
 const fs = require('fs');
+const { Op } = require('sequelize');
 
 const friendService = require('../services/friendService');
-const { User, Comment, Post, Like } = require('../models/index');
+const { User, Comment, Post, Like, Friend } = require('../models/index');
 const cloudinary = require('../utils/cloundinary');
 const createError = require('../utils/createError');
 
@@ -11,6 +12,34 @@ exports.getMe = async (req, res, next) => {
     const user = JSON.parse(JSON.stringify(req.user));
     user.friends = friends;
     res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: { exclude: ['password'] },
+    });
+    if (!user) {
+      createError('User not found', 400);
+    }
+    const result = JSON.parse(JSON.stringify(user));
+    const friends = await friendService.findAcceptedFriend(user.id);
+    result.friends = friends;
+    const friend = await Friend.findOne({
+      where: {
+        [Op.or]: [
+          { requestToId: user.id, requestFromId: req.user.id },
+          { requestToId: req.user.id, requestFromId: user.id },
+        ],
+      },
+    });
+    result.friendStatus = friend;
+    res.json({ user: result });
   } catch (err) {
     next(err);
   }
