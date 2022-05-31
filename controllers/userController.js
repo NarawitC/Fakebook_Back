@@ -104,6 +104,7 @@ exports.getUserPost = async (req, res, next) => {
     const posts = await Post.findAll({
       attributes: { exclude: ['userId'] },
       where: { userId },
+      order: [['updatedAt', 'DESC']],
       include: [
         {
           model: User,
@@ -122,8 +123,35 @@ exports.getUserPost = async (req, res, next) => {
           attributes: {
             exclude: ['userId', 'createdAt'],
           },
+          include: {
+            model: User,
+            attributes: {
+              exclude: [
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
+              ],
+            },
+          },
         },
-        { model: Like },
+        {
+          model: Like,
+          attributes: { exclude: ['createdAt'] },
+          include: {
+            model: User,
+            attributes: {
+              exclude: [
+                'password',
+                'email',
+                'phoneNumber',
+                'coverPhoto',
+                'createdAt',
+              ],
+            },
+          },
+        },
       ],
     });
     res.json({ posts });

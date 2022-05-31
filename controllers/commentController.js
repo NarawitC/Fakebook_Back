@@ -4,6 +4,7 @@ const createError = require('../utils/createError');
 exports.createComment = async (req, res, next) => {
   try {
     const { title } = req.body;
+    console.log(req.body);
     const { postId } = req.params;
     const comment = await Comment.create({
       title,
